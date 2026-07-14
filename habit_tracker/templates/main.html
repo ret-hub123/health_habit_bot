@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои привычки{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Мои привычки</h1>
+
+            <!-- ✅ Flash-сообщения -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+
+            {% if habbit %}
+                <div class="row">
+                    {% for habit in habbit %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100" style="border-left: 5px solid{{ habit.color }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        {{ habit.get_icon_emoji() }} {{ habit.name }}
+                                    </h5>
+                                    <p class="card-text">
+                                        {{ habit.description or 'Нет описания' }}
+                                    </p>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <strong>Цель:</strong>
+                                            {% if habit.target %}
+                                                {{ habit.target }} {{ habit.get_unit_label() }}
+                                            {% else %}
+                                                Нет
+                                            {% endif %}
+                                            <br>
+                                            <strong>Частота:</strong> {{ habit.get_frequency_label() }}
+                                            <br>
+                                            <strong>Статус:</strong>
+                                            {% if habit.is_active %}
+                                                <span class="badge bg-success">Активна</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Неактивна</span>
+                                            {% endif %}
+                                        </small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center py-5">
+                        <h4> Пока нет привычек</h4>
+                        <p class="mb-0">Нажми кнопку <strong>"Добавить привычку"</strong> чтобы начать!</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

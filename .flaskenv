@@ -1,0 +1,3 @@
+FLASK_APP=habit_tracker
+FLASK_ENV=development
+FLASK_DEBUG=True
