@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'main/base.html' %}
 
 {% block title %}Добавить привычку{% endblock %}
 
@@ -12,7 +12,7 @@
                 </div>
                 <div class="card-body">
 
-                    <!-- ⚠️ Flash-сообщения для ошибок -->
+                    <!-- Flash-сообщения для ошибок -->
                     {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}
                             {% for category, message in messages %}

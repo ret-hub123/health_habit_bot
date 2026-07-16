@@ -1,9 +1,9 @@
 from flask import Blueprint
 
 from flask import render_template, request, flash, redirect, url_for
-from .constant import IconEnum, UnitEnum, FrequencyEnum, DayEnum
-from .build_model import db
-from .models import Habit
+from ..constant import IconEnum, UnitEnum, FrequencyEnum, DayEnum
+from ..build_model import db
+from ..models import Habit
 
 habit = Blueprint('habit', __name__)
 
@@ -11,7 +11,7 @@ habit = Blueprint('habit', __name__)
 @habit.route('/main')
 def main_page():
     habbit = Habit.query.all()
-    return render_template("main.html", habbit=habbit)
+    return render_template("main/main.html", habbit=habbit)
 
 
 @habit.route('/add_habbit', methods=['GET', 'POST'])
@@ -62,7 +62,7 @@ def add_habbit():
                                    UnitEnum=UnitEnum,
                                    FrequencyEnum=FrequencyEnum)
 
-    return render_template('add habbit.html',
+    return render_template('main/add habbit.html',
                            IconEnum=IconEnum,
                            UnitEnum=UnitEnum,
                            FrequencyEnum=FrequencyEnum)

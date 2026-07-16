@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'main/base.html' %}
 
 {% block title %}Мои привычки{% endblock %}
 
@@ -8,7 +8,7 @@
         <div class="col-12">
             <h1 class="mb-4">Мои привычки</h1>
 
-            <!-- ✅ Flash-сообщения -->
+            <!-- Flash-сообщения -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
