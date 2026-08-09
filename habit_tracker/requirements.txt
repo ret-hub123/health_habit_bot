@@ -3,3 +3,6 @@ Flask-SQLAlchemy
 psycopg2-binary
 python-dotenv
 flask-migrate
+flask_wtf
+flask_bcrypt
+flask_login

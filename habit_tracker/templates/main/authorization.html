@@ -1,0 +1,73 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Вход в систему{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header" style="background-color: #198754; color: white;">
+                    <h3 class="mb-0">Вход в систему</h3>
+                </div>
+                <div class="card-body">
+
+                    <form method="POST">
+                        {{ form.csrf_token() }}
+
+                        <div class="mb-2">
+                            {{ form.login.label }}
+                            {{ form.login(class="form-control mb-3 mt-1", placeholder="Введите логин") }}
+                            {% if form.login.errors %}
+                                <div class="mt-2 p-2 bg-danger bg-opacity-10 rounded-2 border border-danger border-opacity-25"
+                                     style="animation: fadeIn 0.3s ease;">
+                                    {% for error in form.login.errors %}
+                                        <div class="d-flex align-items-center text-danger small fw-semibold" style="gap: 6px;">
+                                            <i class="fas fa-circle-exclamation" style="font-size: 0.7rem;"></i>
+                                            <span>{{ error }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-2">
+                            {{ form.password.label }}
+                            {{ form.password(class="form-control mb-3 mt-1", placeholder="Введите пароль") }}
+                            {% if form.password.errors %}
+                                <div class="mt-2 p-2 bg-danger bg-opacity-10 rounded-2 border border-danger border-opacity-25"
+                                     style="animation: fadeIn 0.3s ease;">
+                                    {% for error in form.password.errors %}
+                                        <div class="d-flex align-items-center text-danger small fw-semibold" style="gap: 6px;">
+                                            <i class="fas fa-circle-exclamation" style="font-size: 0.7rem;"></i>
+                                            <span>{{ error }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            {{ form.remember(class="form-check-input") }}
+                            {{ form.remember.label(class="form-check-label") }}
+                        </div>
+
+                        <button type="submit" class="btn w-100" style="background-color: #198754; color: white;">
+                            Войти
+                        </button>
+
+                        <div class="text-center mt-3">
+                            <small>
+                                Нет аккаунта?
+                                <a href="{{ url_for('user.user_registration') }}" class="text-decoration-none" style="color: #198754;">
+                                    Зарегистрироваться
+                                </a>
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

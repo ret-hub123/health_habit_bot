@@ -25,3 +25,8 @@ main {
     align-items: center;
 }
 
+.nav-btn {
+    min-width: 50px;
+    text-align: center;
+}
+

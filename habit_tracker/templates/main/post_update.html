@@ -1,0 +1,113 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Редактировать привычку{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">✏️ Редактировать привычку</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Название *</label>
+                            <input type="text" name="name" class="form-control"
+                                   placeholder="Например: Утренняя зарядка"
+                                   value="{{ habit.name }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Описание</label>
+                            <textarea name="description" class="form-control" rows="3"
+                                      placeholder="Краткое описание">{{ habit.description or '' }}</textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Иконка</label>
+                                <select name="icon" class="form-select">
+                                    {% for item in IconEnum %}
+                                        <option value="{{ item.value }}"
+                                                {% if habit.icon == item.value %}selected{% endif %}>
+                                            {{ IconEnum.get_emoji(item.value) }} {{ item.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Цвет</label>
+                                <input type="color" name="color" class="form-control form-control-color"
+                                       value="{{ habit.color or '#2ea44f' }}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Цель</label>
+                                <input type="number" name="target" class="form-control"
+                                       placeholder="30" min="1" value="{{ habit.target or '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Единицы</label>
+                                <select name="unit" class="form-select">
+                                    <option value="">Без единиц</option>
+                                    {% for item in UnitEnum %}
+                                        <option value="{{ item.value }}"
+                                                {% if habit.unit == item.value %}selected{% endif %}>
+                                            {{ UnitEnum.get_label(item.value) }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Частота</label>
+                            <select name="frequency" class="form-select">
+                                {% for item in FrequencyEnum %}
+                                    <option value="{{ item.value }}"
+                                            {% if habit.frequency == item.value %}selected{% endif %}>
+                                        {{ FrequencyEnum.get_label(item.value) }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Время напоминания</label>
+                                <input type="time" name="reminder_time" class="form-control"
+                                       value="{{ habit.reminder_time.strftime('%H:%M') if habit.reminder_time else '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Дни напоминания</label>
+                                <input type="text" name="reminder_days" class="form-control"
+                                       placeholder="1,2,3,4,5,6,7"
+                                       value="{{ habit.reminder_days or '' }}">
+                                <small class="text-muted">1-7 (пн-вс)</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" name="is_active" class="form-check-input"
+                                   {% if habit.is_active %}checked{% endif %}>
+                            <label class="form-check-label fw-bold">Активна</label>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                               Обновить
+                            </button>
+                            <a href="{{ url_for('habit.main_page') }}" class="btn btn-secondary btn-lg">Отмена</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

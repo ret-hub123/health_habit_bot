@@ -22,9 +22,11 @@
     
     <nav class="navbar navbar-expand-md bg-white border-bottom py-2">
         <div class="container">
-            <a href="/main" class="navbar-brand fw-bold">
-                🏋️ Health Habit Tracker
+            <a href="{{ url_for('habit.main_page') }}" class="navbar-brand fw-bold">
+                🥦 Health Habit Tracker
             </a>
+
+            {% include 'main/flash_messages.html' %}
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
                 <span class="navbar-toggler-icon"></span>
@@ -33,18 +35,38 @@
             <div class="collapse navbar-collapse" id="navMenu">
                 <ul class="navbar-nav ms-auto align-items-center gap-2">
 
+                    {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a href="/add_habbit" class="btn btn-success text-white px-3 py-2">
+                        <a href="{{ url_for('habit.add_habbit') }}" class="btn btn-success text-white px-3 py-2">
                             <i class="bi bi-plus-circle"></i> Новая привычка
                         </a>
                     </li>
 
-
-                    <li class="nav-item">
-                        <a href="/user_account" class="btn btn-outline-secondary profile-btn" title="Профиль">
+                                        <li class="nav-item">
+                        <a href="{{ url_for('user.user_account') }}" class="btn btn-outline-secondary nav-btn px-3 py-2" title="Профиль">
                             <i class="bi bi-person"></i>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="{{ url_for('user.logout') }}" class="btn btn-outline-danger nav-btn px-3 py-2" title="Выйти">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('user.login') }}" class="btn btn-outline-secondary px-3 py-2">
+                            <i class="bi bi-box-arrow-in-right"></i> Войти
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('user.user_registration') }}" class="btn btn-success text-white px-3 py-2">
+                            <i class="bi bi-person-plus"></i> Регистрация
+                        </a>
+                    </li>
+                    {% endif %}
+
+
                 </ul>
             </div>
         </div>
@@ -54,6 +76,7 @@
     <main class="py-4">
         <div class="container">
             {% block content %}
+
             <h1>Добро пожаловать!</h1>
             <p class="text-muted">Здесь будет контент</p>
             {% endblock %}
