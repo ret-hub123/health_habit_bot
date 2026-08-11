@@ -1,10 +1,11 @@
 from .config import Config
 from flask import Flask
 
-from .build_model import db, migrate, login_manager
+from .build_model import db, migrate, login_manager, csrf
 
 from .routes.habit import habit
 from .routes.user import user
+
 
 
 def create_app(config_class=Config):
@@ -19,6 +20,7 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
 
     login_manager.login_view = 'user.login'
+    csrf.init_app(app)
 
 
     with app.app_context():

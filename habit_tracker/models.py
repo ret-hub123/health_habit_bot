@@ -2,7 +2,7 @@ from flask_login import UserMixin
 
 from .build_model import db, login_manager
 from .constant import IconEnum, UnitEnum, FrequencyEnum, DayEnum
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 
 
 class Habit(db.Model):
@@ -19,7 +19,6 @@ class Habit(db.Model):
     unit = db.Column(db.String(50), nullable=True)
     frequency = db.Column(db.String(50), default='daily', nullable=False)
 
-    # Напоминание
     reminder_time = db.Column(db.Time)
     reminder_days = db.Column(db.String(50))
 
@@ -30,8 +29,17 @@ class Habit(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
+    logs = db.relationship('HabitLog', backref='habit', lazy=True, cascade='all, delete-orphan')
+
     def __repr__(self):
         return f'<Habit {self.name}, owner - > {self.user_id.username}'
+
+    def is_completed_today(self):
+        today = date.today()
+        for log in self.logs:
+            if log.date == today:
+                return log.completed
+        return False
 
     def get_icon_emoji(self):
         return IconEnum.get_emoji(self.icon)
@@ -41,6 +49,26 @@ class Habit(db.Model):
 
     def get_frequency_label(self):
         return FrequencyEnum.get_label(self.frequency)
+
+
+class HabitLog(db.Model):
+    """Лог выполнения привычки"""
+    __tablename__ = 'habit_logs'
+
+    id = db.Column(db.Integer, primary_key=True)
+    habit_id = db.Column(db.Integer, db.ForeignKey('habits.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False, default=lambda: date.today())
+    completed = db.Column(db.Boolean, default=True)
+
+    value = db.Column(db.Integer, nullable=True)
+    note = db.Column(db.String(200), nullable=True)
+
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    def __repr__(self):
+        return f'<HabitLog {self.habit.name} - {self.date}>'
+
+
 
 @login_manager.user_loader
 def load_user(user_id):

@@ -1,9 +1,11 @@
+from datetime import date, timedelta
+
 from flask import Blueprint
 
 from flask import render_template, request, flash, redirect, url_for
 from ..constant import IconEnum, UnitEnum, FrequencyEnum, DayEnum
 from ..build_model import db
-from ..models import Habit
+from ..models import Habit, HabitLog
 from flask_login import current_user, login_required
 
 habit = Blueprint('habit', __name__)
@@ -74,6 +76,56 @@ def add_habbit():
                            FrequencyEnum=FrequencyEnum)
 
 
+@habit.route('/habit/<int:id>/complete', methods=['POST'])
+@login_required
+def complete_habbit(id):
+    habit = Habit.query.get_or_404(id)
+
+    if habit.user_id != current_user.id:
+        flash('Доступ запрещён', 'danger')
+        return redirect(url_for('habit.main_page'))
+
+    today = date.today()
+    existing_today_log = HabitLog.query.filter_by(habit_id=habit.id, date=today).first()
+
+    if existing_today_log:
+        existing_today_log.completed = True
+    else:
+        log = HabitLog(habit_id=habit.id,
+            date=today,
+            completed=True)
+        db.session.add(log)
+
+    db.session.commit()
+    flash('Привычка выполнена!', 'success')
+
+    return redirect(url_for('habit.main_page'))
+
+@habit.route('/habit/<int:id>/uncomplete', methods=['POST'])
+@login_required
+def uncomplete_habbit(id):
+    habit = Habit.query.get_or_404(id)
+    today = date.today()
+
+    if habit.user_id != current_user.id:
+        flash('Доступ запрещён', 'danger')
+        return redirect(url_for('habit.main_page'))
+
+    existing_today_log = HabitLog.query.filter_by(habit_id=habit.id, date=today).first()
+
+    if existing_today_log:
+        try:
+            existing_today_log.completed = False
+            db.session.commit()
+            flash('Отметка отменена', 'warning')
+        except Exception as e:
+            db.session.rollback()
+            flash('Ошибка при изменении статуса', 'danger')
+            print(e)
+
+    return redirect(url_for('habit.main_page'))
+
+
 
 @habit.route('/habit/<int:id>/update', methods=['GET', 'POST'])
 @login_required
@@ -112,7 +164,7 @@ def update_habbit(id):
                            UnitEnum=UnitEnum,
                            FrequencyEnum=FrequencyEnum)
 
-@habit.route('/habit/<int:id>/delete', methods=['GET', 'POST'])
+@habit.route('/habit/<int:id>/delete', methods=['POST'])
 @login_required
 def delete_habbit(id):
     habit = Habit.query.get_or_404(id)
@@ -132,3 +184,48 @@ def delete_habbit(id):
         print(e)
 
     return redirect(url_for('habit.main_page'))
+
+
+@habit.route('/progress', methods=['GET'])
+@login_required
+def progress():
+    habits = Habit.query.filter_by(user_id = current_user.id).all()
+    print(f"Найдено привычек: {len(habits)}")
+
+    today = date.today()
+    start_date = today - timedelta(days=29)
+    dates = [start_date + timedelta(days=i) for i in range(30)]
+
+    progress_data = []
+    count_succes = 0
+    for habit in habits:
+
+        habit_data = {
+            'habit': habit,
+            'days': []
+        }
+
+        for day in dates:
+            log = next((l for l in habit.logs if l.date == day), None)
+
+            if log:
+                status = 'completed' if log.completed else 'missing'
+                if log.completed: count_succes += 1
+                value = log.value
+            else:
+                status = 'missing'
+                value = None
+
+            habit_data['days'].append({
+                'date': day,
+                'status': status,
+                'value': value
+            })
+
+        progress_data.append(habit_data)
+
+
+
+
+    return render_template('main/progress.html',
+                           dates=dates, habits = habits, progress_data = progress_data, count_succes = count_succes)

@@ -10,12 +10,18 @@
                 <h1 class="mb-0">Мои привычки</h1>
             </div>
 
-
             {% if not current_user.is_authenticated %}
                 <div class="alert text-center py-4 border-2 mb-3" style="border: 2px dashed #ffc107;">
                     <h4 class="mb-3">🔒 Для добавления привычек необходимо авторизоваться</h4>
                     <p class="mb-3">Войдите в свой аккаунт или зарегистрируйтесь, чтобы начать отслеживать свои привычки.</p>
-
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{{ url_for('user.login') }}" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right"></i> Войти
+                        </a>
+                        <a href="{{ url_for('user.user_registration') }}" class="btn btn-success">
+                            <i class="bi bi-person-plus"></i> Регистрация
+                        </a>
+                    </div>
                 </div>
             {% elif habbit %}
                 {% for habit in habbit %}
@@ -23,7 +29,6 @@
                         <div class="card-body py-3 px-4">
 
                             <div class="row align-items-center">
-                                <!-- Иконка + Название -->
                                 <div class="col-md-4 col-lg-3">
                                     <div class="d-flex align-items-center">
                                         <span style="font-size: 1.8rem; margin-right: 10px;">
@@ -62,30 +67,48 @@
                             <div class="row mt-3 pt-2 border-top">
                                 <div class="col-12">
                                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                        <!-- Статус -->
                                         <div>
                                             <span class="badge {% if habit.is_active %}bg-success{% else %}bg-secondary{% endif %} px-4 py-2 fs-6">
                                                 {% if habit.is_active %}
                                                     Активна
                                                 {% else %}
-                                                     Неактивна
+                                                    Неактивна
                                                 {% endif %}
                                             </span>
                                         </div>
 
                                         <div class="d-flex gap-2 flex-wrap">
+                                            {% if habit.is_completed_today() %}
+                                                <form method="POST" action="{{ url_for('habit.uncomplete_habbit', id=habit.id) }}"
+                                                      style="display: inline;">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-warning rounded-pill">
+                                                        <i class="bi bi-x-circle"></i> Отменить
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <form method="POST" action="{{ url_for('habit.complete_habbit', id=habit.id) }}"
+                                                      style="display: inline;">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-success rounded-pill">
+                                                        <i class="bi bi-check-lg"></i> Выполнить
+                                                    </button>
+                                                </form>
+                                            {% endif %}
 
                                             <a href="{{ url_for('habit.update_habbit', id=habit.id) }}"
-                                               class="btn btn-outline-primary"
-                                               title="Редактировать">
+                                               class="btn btn-outline-primary">
                                                 <i class="bi bi-pencil"></i> Редактировать
                                             </a>
-                                            <a href="{{ url_for('habit.delete_habbit', id=habit.id) }}"
-                                               class="btn btn-outline-danger"
-                                               title="Удалить"
-                                               onclick="return confirm('Удалить привычку «{{ habit.name }}»?')">
-                                                <i class="bi bi-trash"></i> Удалить
-                                            </a>
+
+                                            <form method="POST" action="{{ url_for('habit.delete_habbit', id=habit.id) }}"
+                                                  style="display: inline;"
+                                                  onsubmit="return confirm('Удалить привычку «{{ habit.name }}»?')">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-outline-danger">
+                                                    <i class="bi bi-trash"></i> Удалить
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -93,6 +116,12 @@
                         </div>
                     </div>
                 {% endfor %}
+
+                <div class="text-center mb-4">
+                        <a href="{{ url_for('habit.progress') }}" class="btn btn-secondary btn-lg px-5">
+                            <i class="bi bi-table"></i> Прогресс
+                        </a>
+                    </div>
             {% else %}
                 <div class="alert alert-info text-center py-5">
                     <h4>🥦 Пока нет привычек</h4>
