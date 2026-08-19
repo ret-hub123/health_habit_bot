@@ -7,7 +7,6 @@ from .routes.habit import habit
 from .routes.user import user
 
 
-
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -21,7 +20,6 @@ def create_app(config_class=Config):
 
     login_manager.login_view = 'user.login'
     csrf.init_app(app)
-
 
     with app.app_context():
         db.create_all()

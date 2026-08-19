@@ -14,14 +14,7 @@
                 <div class="alert text-center py-4 border-2 mb-3" style="border: 2px dashed #ffc107;">
                     <h4 class="mb-3">🔒 Для добавления привычек необходимо авторизоваться</h4>
                     <p class="mb-3">Войдите в свой аккаунт или зарегистрируйтесь, чтобы начать отслеживать свои привычки.</p>
-                    <div class="d-flex justify-content-center gap-2">
-                        <a href="{{ url_for('user.login') }}" class="btn btn-primary">
-                            <i class="bi bi-box-arrow-in-right"></i> Войти
-                        </a>
-                        <a href="{{ url_for('user.user_registration') }}" class="btn btn-success">
-                            <i class="bi bi-person-plus"></i> Регистрация
-                        </a>
-                    </div>
+
                 </div>
             {% elif habbit %}
                 {% for habit in habbit %}
