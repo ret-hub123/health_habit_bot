@@ -1,7 +1,10 @@
+
 services:
   postgres:
     image: postgres:14
     container_name: postgres
+    networks:
+      - app_net
     env_file:
       - .env
     environment:
@@ -11,14 +14,16 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
+      - ~/.pg/pg_data/flask-yt/:/var/lib/postgresql/data
+
 
   flask:
     build:
       dockerfile: Dockerfile
       context: .
-    container_name: flask_app
+    container_name: flask
+    networks:
+      - app_net
     volumes:
       - ~/.uploads/images/flask-yt:/app/habit_tracker/static/upload
     env_file:
@@ -32,13 +37,15 @@ services:
     depends_on:
         - postgres
     expose:
-      - "8080"
+      - 8080
 
   nginx:
     build:
       dockerfile: ./Dockerfile
       context: ./nginx/
     container_name: nginx
+    networks:
+      - app_net
     env_file:
       - .env
     depends_on:
@@ -48,4 +55,7 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  app_net:
 
