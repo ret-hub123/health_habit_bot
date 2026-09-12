@@ -1,3 +1,6 @@
 .venv
 migrations/
 .env
+postgres_data/
+__pycache__/
+.flaskenv

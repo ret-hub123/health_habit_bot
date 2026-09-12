@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, url_for, flash, request
 from flask import render_template
 from flask_login import login_user, logout_user, current_user, login_required
+from urllib.parse import urlparse, urljoin
 
 from ..forms import RegistrationFrom, LoginFrom
 from ..models import User
@@ -9,9 +10,28 @@ from ..build_model import db, bcrypt
 
 user = Blueprint('user', __name__)
 
+
+
+def is_safe_url(target):
+    """
+    Проверяет, что URL ведёт на наш же сайт.
+    Защита от Open Redirect.
+    """
+    if not target:
+        return False
+
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+
+    return (
+        test_url.scheme in ('http', 'https')
+        and ref_url.netloc == test_url.netloc
+    )
+
 @user.route('/user_account')
 def user_account():
     return render_template('main/user.html')
+
 
 @user.route('/registration', methods=['GET', 'POST'])
 def user_registration():
@@ -49,9 +69,14 @@ def login():
         user = User.query.filter_by(login=form.login.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
+
             next_page = request.args.get('next')
             flash(f'Успешная авторизация пользователя {user.username}', 'success')
-            return redirect(next_page) if next_page else redirect('/main')
+
+            if is_safe_url(next_page):
+                return redirect(next_page)
+            return redirect(url_for('main.main_page'))
+
         else:
             flash(f'Ошибка входа, пожалуйста проверьте свой логин и пароль', "warning")
 
@@ -63,3 +88,6 @@ def logout():
     logout_user()
     flash('Вы успешно вышли из системы', 'info')
     return redirect('/main')
+
+
+

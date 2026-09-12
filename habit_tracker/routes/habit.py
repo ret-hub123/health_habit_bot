@@ -1,12 +1,16 @@
 from datetime import date, timedelta
 
+
 from flask import Blueprint
 
 from flask import render_template, request, flash, redirect, url_for
+from flask_wtf.csrf import generate_csrf
+
 from ..constant import IconEnum, UnitEnum, FrequencyEnum, DayEnum
 from ..build_model import db
 from ..models import Habit, HabitLog
 from flask_login import current_user, login_required
+
 
 habit = Blueprint('habit', __name__)
 
@@ -23,13 +27,15 @@ def main_page():
 @habit.route('/add_habbit', methods=['GET', 'POST'])
 @login_required
 def add_habbit():
+    csrf_token = generate_csrf()
     if request.method == 'POST':
         if not request.form.get('name'):
             flash('Название обязательно!', 'danger')
             return render_template('add habbit.html',
                                    IconEnum=IconEnum,
                                    UnitEnum=UnitEnum,
-                                   FrequencyEnum=FrequencyEnum)
+                                   FrequencyEnum=FrequencyEnum,
+                                   csrf_token= csrf_token)
 
         name = request.form['name']
         description = request.form.get('description', '')
